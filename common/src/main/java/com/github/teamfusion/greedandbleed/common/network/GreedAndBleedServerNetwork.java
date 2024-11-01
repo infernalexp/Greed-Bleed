@@ -22,6 +22,7 @@ import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.AABB;
 
 public class GreedAndBleedServerNetwork implements GreedAndBleedNetwork {
@@ -33,29 +34,42 @@ public class GreedAndBleedServerNetwork implements GreedAndBleedNetwork {
 
     private static void onRecruit(FriendlyByteBuf friendlyByteBuf, NetworkManager.PacketContext packetContext) {
         Player player = packetContext.getPlayer();
-        Level level = packetContext.getPlayer().level();
-        GBPygmy pygmy = player.level().getNearestEntity(GBPygmy.class, TargetingConditions.forNonCombat().range(10F).ignoreLineOfSight(), player, player.blockPosition().getX(), player.blockPosition().getY(), player.blockPosition().getZ(), new AABB(player.blockPosition()).inflate(10F));
+        Level level = player.level();
+        GBPygmy pygmy = level.getNearestEntity(
+            GBPygmy.class,
+            TargetingConditions.forNonCombat()
+                .range(10F)
+                .ignoreLineOfSight(),
+            player,
+            player.blockPosition().getX(),
+            player.blockPosition().getY(),
+            player.blockPosition().getZ(),
+            new AABB(player.blockPosition())
+                .inflate(10F)
+        );
 
-        BlockPos blockPos = friendlyByteBuf.readBlockPos();
-        if (pygmy != null && level instanceof ServerLevel serverLevel) {
+        BlockPos origin = friendlyByteBuf.readBlockPos();
+        if (pygmy != null && level instanceof ServerLevel server) {
             Brain<?> brain = pygmy.getBrain();
-            BlockEntity blockEntity = serverLevel.getBlockEntity(blockPos);
-            if (blockEntity instanceof PygmyStationBlockEntity pygmyStationBlock) {
-                ItemStack stack = pygmyStationBlock.getItem(0);
+            BlockEntity blockEntity = server.getChunkAt(origin).getBlockEntity(origin, LevelChunk.EntityCreationType.IMMEDIATE);
+            
+            if (blockEntity instanceof PygmyStationBlockEntity station) {
+                ItemStack stack = station.getItem(0);
+                
                 if (stack.getItem() == ItemRegistry.PIGLIN_BELT.get()) {
-
-                    if (serverLevel.getPoiManager().take(poiTypeHolder -> {
-                        return poiTypeHolder.value() == PoiRegistry.PYGMY_STATION.get();
-                    }, (poiTypeHolder, blockPos1) -> blockPos1.equals(blockPos), blockPos, 1).isPresent()) {
-
-                        brain.setMemory(MemoryModuleType.JOB_SITE, GlobalPos.of(serverLevel.dimension(), blockPos));
-
-                        addWorkTime(pygmy, 24000 * stack.getCount());
-                        stack.shrink(stack.getCount());
-                        pygmy.playSound(SoundEvents.ITEM_PICKUP, 0.7F, 1.25F);
-                        pygmy.swing(InteractionHand.MAIN_HAND);
-                        DebugPackets.sendPoiTicketCountPacket(serverLevel, blockPos);
-                    }
+                    server.getPoiManager()
+                        .take(
+                            holder -> holder.value() == PoiRegistry.PYGMY_STATION.get(),
+                            (holder, pos) -> pos.equals(origin), origin, 1
+                        ).ifPresent(pos -> {
+                            brain.setMemory(MemoryModuleType.JOB_SITE, GlobalPos.of(server.dimension(), origin));
+                            
+                            addWorkTime(pygmy, 24000 * stack.getCount());
+                            stack.shrink(stack.getCount());
+                            pygmy.playSound(SoundEvents.ITEM_PICKUP, 0.7F, 1.25F);
+                            pygmy.swing(InteractionHand.MAIN_HAND);
+                            DebugPackets.sendPoiTicketCountPacket(server, origin);
+                        });
                 }
             }
         }

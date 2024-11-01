@@ -21,10 +21,10 @@ public class BlockEntityRegistry {
     );
 
     public static final Supplier<BlockEntityType<PygmyArmorStandBlockEntity>> PYGMY_ARMOR_STAND = BLOCK_ENTITIES.create(
-            "pygmy_armor_stand",
-            () -> BlockEntityType.Builder.of(
-                    PygmyArmorStandBlockEntity::new,
-                    BlockRegistry.PYGMY_ARMOR_STAND.get()
-            ).build(null)
+        "pygmy_armor_stand",
+        () -> BlockEntityType.Builder.of(
+                PygmyArmorStandBlockEntity::new,
+                BlockRegistry.PYGMY_ARMOR_STAND.get()
+        ).build(null)
     );
 }
