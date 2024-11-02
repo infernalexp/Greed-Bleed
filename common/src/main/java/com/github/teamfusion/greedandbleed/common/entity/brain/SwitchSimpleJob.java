@@ -23,7 +23,12 @@ public class SwitchSimpleJob<E extends Mob, T extends LivingEntity> extends Beha
     @Override
     protected void start(ServerLevel serverLevel, E livingEntity, long l) {
         super.start(serverLevel, livingEntity, l);
-        livingEntity.getBrain().setActiveActivityIfPossible(Activity.WORK);
+        boolean flag = livingEntity.getBrain().hasMemoryValue(MemoryRegistry.WORK_TIME.get());
+        if (flag) {
+            livingEntity.getBrain().setActiveActivityIfPossible(Activity.WORK);
+        } else {
+            livingEntity.getBrain().setActiveActivityIfPossible(Activity.IDLE);
+        }
     }
 }
 
