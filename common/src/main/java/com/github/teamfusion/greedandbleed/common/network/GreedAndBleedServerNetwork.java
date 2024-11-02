@@ -39,7 +39,8 @@ public class GreedAndBleedServerNetwork implements GreedAndBleedNetwork {
             GBPygmy.class,
             TargetingConditions.forNonCombat()
                 .range(10F)
-                .ignoreLineOfSight(),
+                    .ignoreLineOfSight()
+                    .ignoreInvisibilityTesting(),
             player,
             player.blockPosition().getX(),
             player.blockPosition().getY(),
@@ -59,7 +60,7 @@ public class GreedAndBleedServerNetwork implements GreedAndBleedNetwork {
                 if (stack.getItem() == ItemRegistry.PIGLIN_BELT.get()) {
                     server.getPoiManager()
                         .take(
-                            holder -> holder.value() == PoiRegistry.PYGMY_STATION.get(),
+                                holder -> holder.is(PoiRegistry.PYGMY_STATION_KEY),
                             (holder, pos) -> pos.equals(origin), origin, 1
                         ).ifPresent(pos -> {
                             brain.setMemory(MemoryModuleType.JOB_SITE, GlobalPos.of(server.dimension(), origin));

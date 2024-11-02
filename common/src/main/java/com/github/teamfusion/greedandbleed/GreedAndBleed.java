@@ -25,7 +25,7 @@ public class GreedAndBleed {
         // ========== MISCELLANEOUS REGISTRY ==========
         BlockRegistry.BLOCKS.register();
         ItemRegistry.ITEMS.register();
-        PoiRegistry.POI_TYPES.register();
+
         BlockEntityRegistry.BLOCK_ENTITIES.register();
         CreativeTabRegistry.CREATIVE_TABS.register();
         MenuTypeRegistry.MENU_TYPE.register();
@@ -34,7 +34,7 @@ public class GreedAndBleed {
         EntityTypeRegistry.ENTITIES.register();
         MemoryRegistry.MEMORY_MODULE_TYPES.register();
         SensorRegistry.SENSOR_TYPES.register();
-
+        PoiRegistry.POI_TYPES.register();
         // ========== MAGIC REGISTRY ==========
         PotionRegistry.MOB_EFFECT.register();
         PotionRegistry.POTION.register();

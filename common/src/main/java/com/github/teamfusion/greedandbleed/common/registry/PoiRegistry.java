@@ -20,7 +20,7 @@ public class PoiRegistry {
         () -> new PoiType(
             ImmutableSet.<BlockState>builder().addAll(BlockRegistry.PYGMY_STATION.get().getStateDefinition().getPossibleStates()).build(),
                 1,
-                3
+                1
         )
     );
 
